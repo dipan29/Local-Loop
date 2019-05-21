@@ -1,21 +1,23 @@
 <?php
 session_start();
 include_once 'dbconnect.php';
-
-if(isset($_POST['scanSubmit'])) {
-	$upc = mysqli_real_escape_string($con, $_POST['product_code']);
-	if(isset($_POST['product_name']))
-		$name = mysqli_real_escape_string($con, $_POST['product_name']);
+$output = '';
+if(isset($_GET['search_text'])) {
 	
-	if($upc){
-		$query = mysqli_query($con, "SELECT * FROM product_info WHERE upc = '".$upc."' ");
-		if($query->num_rows == 1){
-			$row = $query->fetch_assoc();			
-			$product_id = $row['product_id'];
-			
-		}
-	}
+	$search = $_GET['search_text'];
+	$query = "
+	SELECT * FROM product_info 
+	WHERE upc LIKE '%".$search."%'
+	OR category LIKE '%".$search."%' 
+	OR product_name LIKE '%".$search."%' 
+	OR company LIKE '%".$search."%' 
+	";
+} else {
+	$query = "
+	SELECT * FROM product_info ORDER BY product_id";
 }
+
+$result = mysqli_query($con, $query);
 
 ?>
 
@@ -36,6 +38,7 @@ if(isset($_POST['scanSubmit'])) {
   <!-- CSS Files -->
   <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
   <link href="assets/css/paper-dashboard.css?v=2.0.0" rel="stylesheet" />
+
 </head>
 
 <body class="">
@@ -146,48 +149,63 @@ if(isset($_POST['scanSubmit'])) {
           <div class="col-md-12">
             <div class="card ">
               <div class="card-header ">
-                <h5 class="card-title">Product Details</h5>
-                <p class="card-category">Your Scanned Code Is <?php if(isset($upc)) echo $upc ;?></p>
+                <h5 class="card-title">Get Product Details</h5>
+                <p class="card-category">Search Product | <strong>Click on Result to Select UPC/EAN</strong></p>
               </div>
               <div class="card-body ">
-				  <div class="row">
-				  	  <div class="col-lg-12">
-					  	<h5><strong>Product Name : </strong><?php echo $row['product_name']; ?></h5>
-						<p><strong>Category : </strong><?php echo $row['category']; ?></p>
-						<p><strong>Company : </strong><?php echo $row['company']; ?> &nbsp;&nbsp;&nbsp;<strong>Price : </strong>Rs. <?php echo $row['price']; ?> /-</p>
-						  
-						  <?php 
-						  	$q1 = mysqli_query($con, "SELECT avg(rating) AS rating FROM product_review WHERE product_id = '".$product_id."'");
-						  	$row1 = $q1->fetch_assoc();
-						  	$r1 = $row1['rating'];
-						  	$q2 = mysqli_query($con, "SELECT avg(rating) AS rating FROM local_review WHERE product_id = '".$product_id."'");
-						  	$row2 = $q2->fetch_assoc();
-						  	$r2 = $row2['rating'];
-						  
-						  	$lstar = (5*$r1 + 2*$r2)/7;
-						  ?>
-						  <div class="row">
-						  	
-							<div class="col-lg-4">
-								<p><strong>Online <i class="fa fa-star text-danger"> </i> Rating</strong> : <?php echo number_format($r1,1); ?> / 5</p>
-							</div>  
-							<div class="col-lg-4">
-								<p><strong>Local <i class="fa fa-star text-danger"> </i> Rating</strong> : <?php echo number_format($r2,1); ?> / 5</p>
-							
+				<form method="get" name="searchForm" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+					<div class="row">
+					
+						<div class="col-lg-10">
+							<div class="input-group" style="padding: 1px">
+								<input class="form-control" id="search_text" name="search_text" type="text" placeholder="Enter Product Name Here..." />
 							</div>
-							<div class="col-lg-4">
-								<p><strong>Our <i class="fa fa-star text-danger"> </i> Recomendation</strong> : <?php echo number_format($lstar,1); ?> / 5</p>
+						</div>
+						<div class="col-lg-2">
+							<div class="input-group">
+								<center><input type="submit" name="search" value="Search" class="btn btn-warning" /></center>
 							</div>
+						</div>
+					</div>
 							
-						  </div>
-						  
-						  <br />
-						  <center><a href="home" class="btn btn-lg btn-info">Scan another Code</a></center>
-					  </div>
-					  
+														
+				  </form>
+				<br />
+				<div id="result"  style="overflow-x: hidden; overflow-y: auto">
+				  <?php 
+					if(mysqli_num_rows($result) > 0)
+						{
+							$output .= '<center><h3>Results</h3></center>
+										<div class="table-responsive" style="overflow-x: hidden; overflow-y: auto">
+											<table id="products" class="table table bordered">
+												<tr>
+													<th>UPC/EAN</th>
+													<th>Product Name</th>
+													<th>Category</th>
+													<th>Company</th>
+												</tr>';
+							while($row = mysqli_fetch_array($result))
+							{
+								$output .= '
+									<tr>
+										<td>'.$row["upc"].'</td>
+										<td>'.$row["product_name"].'</td>
+										<td>'.$row["category"].'</td>
+										<td>'.$row["company"].'</td>
+									</tr>
+								';
+							}
+							echo $output."</table></div>";
+						}
+						else
+						{
+							echo '<center><h3>Results</h3> <br />No Products Found</center>';
+						}
+					?>
 				  </div>
 
               </div>
+			  
               <div class="card-footer ">
                 <hr>
                 <div class="stats">
@@ -197,115 +215,6 @@ if(isset($_POST['scanSubmit'])) {
             </div>
           </div>
         </div>	
-		  
-
-        <div class="row">
-          <div class="col-lg-6 col-md-6 col-sm-6">
-              <div class="card ">
-				  <div class="card-header ">
-					<h5 class="card-title"><i class="nc-icon nc-globe text-warning"></i> Online Reviews</h5>
-					<p class="card-category"><?php if(isset($upc)) echo $row['product_name'] ;?></p>
-				  </div>
-				  <div class="card-body ">
-					  <div class="row" style="max-height: 360px; overflow-y: auto; overflow-x: hidden">
-						  <div class="col-lg-12" style="margin-left: 5px;">
-							  <?php 
-							  	$queryReview = mysqli_query($con, "SELECT * FROM product_review WHERE product_id = '".$product_id."'");
-								if($queryReview->num_rows > 0){
-									while($review = $queryReview->fetch_assoc()) {
-										?>
-							  			<div class="row">
-							  				<div class="col-lg-12">
-												<p style="font-size: 18px;"><?php echo $review['review_title']; ?>&nbsp;&nbsp;<span style="font-size: 12px"><i class="fa fa-user"> </i> <?php echo $review['reviewer_name'] ; ?>  |  <i><?php echo substr($review['review_date'],0,10); ?></i></span>
-												<span style="float: right"><a href="scripts/change_upvote"><i class="fa fa-thumbs-up text-success"> </i></a> <strong><?php echo $review['upvote_count']; ?></strong></span>
-												</p>
-												
-												
-												<span><i><?php echo nl2br($review['review_full']) ;?></i></span>
-												<br />
-												<span style="padding-top : 5px">
-												<?php for($i=0; $i<$review['rating']; $i++) { ?>
-													<i class="fa fa-star"> </i> 
-												<?php } ?>
-													
-													<span style="float: right">Publisher : <strong><?php echo $review['publisher']; ?></strong></span>
-												</span>
-											</div>
-							  			</div>
-							  			<hr>
-							  <?php
-									}
-								}
-							  ?>
-							  
-							  <br/><center><i>End of Results</i></center>
-						  </div>
-
-					  </div>
-
-				  </div>
-				  <div class="card-footer ">
-					<hr>
-					<div class="stats">
-					  <i class="fa fa-info"></i> Online Reviews
-					</div>
-				  </div>
-				</div>
-
-          </div>
-
-          <div class="col-lg-6 col-md-6 col-sm-6">
-				<div class="card ">
-				  <div class="card-header ">
-					<h5 class="card-title"><i class="nc-icon nc-favourite-28 text-info"></i> Local Loop Reviews</h5>
-					<p class="card-category"><?php if(isset($upc)) echo $row['product_name'] ;?></p>
-				  </div>
-				  <div class="card-body ">
-					  <div class="row" style="max-height: 360px; overflow-y: auto; overflow-x: hidden">
-						  <div class="col-lg-12" style="margin-left: 5px;">
-							  <?php 
-							  	$queryReview = mysqli_query($con, "SELECT * FROM local_review WHERE product_id = '".$product_id."'");
-								if($queryReview->num_rows > 0){
-									while($review = $queryReview->fetch_assoc()) {
-										?>
-							  			<div class="row">
-							  				<div class="col-lg-12">
-												<p style="font-size: 18px;"><?php echo $review['review_title']; ?>&nbsp;&nbsp;<span style="font-size: 12px"><i class="fa fa-user"> </i> <?php echo $review['reviewer_name'] ; ?>  |  <i><?php echo substr($review['review_date'],0,10); ?></i></span>
-												<span style="float: right"><a href="scripts/change_upvote"><i class="fa fa-thumbs-up text-success"> </i></a> <strong><?php echo $review['upvote_count']; ?></strong></span>
-												</p>
-												
-												
-												<span><i><?php echo nl2br($review['review_full']) ;?></i></span>
-												<br />
-												<span style="padding-top : 5px">
-												<?php for($i=0; $i<$review['rating']; $i++) { ?>
-													<i class="fa fa-star"> </i> 
-												<?php } ?>
-													<span style="float: right">Publisher : <strong>Local Loop</strong></span>
-												</span>
-											</div>
-							  			</div>
-							  			<hr>
-							  <?php
-									}
-								}
-							  ?>
-							  
-							  <br/><center><i>End of Results</i></center>
-						  </div>
-
-					  </div>
-
-				  </div>
-				  <div class="card-footer ">
-					<hr>
-					<div class="stats">
-					  <i class="fa fa-leaf"></i> &copy; Local Loop
-					</div>
-				  </div>
-				</div>
-          </div>
-        </div>
 
 
       </div>
@@ -334,7 +243,40 @@ if(isset($_POST['scanSubmit'])) {
     </div>
   </div>
 	
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script>
+		function addRowHandlers() {
+		  var table = document.getElementById("products");
+		  var rows = table.getElementsByTagName("tr");
+		  for (i = 0; i < rows.length; i++) {
+			var currentRow = table.rows[i];
+			var createClickHandler = function(row) {
+			  return function() {
+				var cell = row.getElementsByTagName("td")[0];
+				var id = cell.innerHTML;
+				var url = "home?ean="+id;
+				window.location.href = url;
+			  };
+			};
+			currentRow.onclick = createClickHandler(currentRow);
+		  }
+		}				  
+	  
+		function searchD() {
+		  var inputTest = localStorage.getItem('searchPass');
+		  document.getElementById("search_text").value = inputTest;
+
+		  localStorage.removeItem( 'searchPass' ); // Clear the localStorage
+		}
+		
+		function loadSet() {
+			addRowHandlers();
+			searchD();
+		}
+		
+		window.onload = loadSet();
+	</script>	
+
+	
 	
   <!--   Core JS Files   -->
   <script src="assets/js/core/jquery.min.js"></script>

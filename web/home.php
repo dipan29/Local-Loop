@@ -2,6 +2,10 @@
 session_start();
 include_once 'dbconnect.php';
 
+if(isset($_GET['ean']))
+{
+	$ean = $_GET['ean'];
+}
 ?>
 
 <!doctype html>
@@ -137,17 +141,32 @@ include_once 'dbconnect.php';
               <div class="card-body ">
 				<form name="scanForm" method="post" action="getData">
 					<div class="input-group">
-						<input id="scanner_input" name="product_code" class="form-control" placeholder="Click the button to scan an EAN..." type="text" /> 
+						<input id="scanner_input" name="product_code" class="form-control" placeholder="Click the button to scan an EAN..." type="text" <?php if(isset($ean)) echo 'value="'.$ean.'"' ; ?>/> 
 						<span class="input-group-btn"> 
 							<button class="btn btn-default" type="button" data-toggle="modal" data-target="#livestream_scanner">
 								<i class="fa fa-barcode"></i>
 							</button> 
 						</span>
 					</div>	
+					<?php if(!isset($ean)) { ?>
 					<div class="input-group" style="padding: 1px">						
-						<input class="form-control" id="product_name" name="product_name" type="text" placeholder="Or Enter Product Name Here..." />
-					
+						<input class="form-control" id="product_name" name="product_name" type="text" placeholder="Or Enter Product Name Here..." onChange="storeMethod()" />
+						<span class="input-group-btn"> 
+							<a href="search">
+							<button class="btn btn-warning" type="button">
+								<i class="fa fa-search"></i>
+							</button> 
+							</a>
+						</span>
 					</div>
+					
+					<script>
+					function storeMethod() {
+						var inputTest = document.getElementById('product_name').value;
+						localStorage.setItem( 'searchPass', inputTest );
+					}
+					</script>
+					<?php } ?>
 					
 					<div class="row">
 						<div class="col-sm-12">
