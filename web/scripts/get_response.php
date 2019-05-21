@@ -1,6 +1,10 @@
 <?php
-$publisher = "Amazon";
-    require_once("dbconnect.php");
+	error_reporting(-1);
+	ini_set('display_errors', 'On');
+
+	$publisher = "Amazon";
+    include_once '../dbconnect.php';
+
     if((isset($_POST['your_name'])&& $_POST['your_name'] !='') && (isset($_POST['product_name'])&& $_POST['product_name'] !=''))
     {
      $yourName = $con->real_escape_string($_POST['your_name']);
@@ -9,6 +13,7 @@ $publisher = "Amazon";
      $reviewTitle = $con->real_escape_string($_POST['review_title']);
      $reviewFull = $con->real_escape_string($_POST['review_full']);
      $upvote = $con->real_escape_string($_POST['upvote']);
+	 $publisher = $con->real_escape_string($_POST['publisher']);
 
 /*		
      $sql="SELECT MAX(review_id) from local_review";
