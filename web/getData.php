@@ -2,6 +2,20 @@
 session_start();
 include_once 'dbconnect.php';
 
+if(isset($_POST['scanSubmit'])) {
+	$upc = mysqli_real_escape_string($con, $_POST['product_code']);
+	$name = mysqli_real_escape_string($con, $_POST['product_name']);
+	
+	if($upc){
+		$query = mysqli_query($con, "SELECT * FROM product_info WHERE upc = '".$upc."' ");
+		if($query->num_rows == 1){
+			$row = $query->fetch_assoc();			
+			$product_id = $row['product_id'];
+			
+		}
+	}
+}
+
 ?>
 
 <!doctype html>
@@ -131,34 +145,46 @@ include_once 'dbconnect.php';
           <div class="col-md-12">
             <div class="card ">
               <div class="card-header ">
-                <h5 class="card-title">Get Product Details</h5>
-                <p class="card-category">Scan Universal Product Code</p>
+                <h5 class="card-title">Product Details</h5>
+                <p class="card-category">Your Scanned Code Is <?php if(isset($upc)) echo $upc ;?></p>
               </div>
               <div class="card-body ">
-				<form name="scanForm" method="post" action="getData">
-					<div class="input-group">
-						<input id="scanner_input" name="product_code" class="form-control" placeholder="Click the button to scan an EAN..." type="text" /> 
-						<span class="input-group-btn"> 
-							<button class="btn btn-default" type="button" data-toggle="modal" data-target="#livestream_scanner">
-								<i class="fa fa-barcode"></i>
-							</button> 
-						</span>
-					</div>	
-					<div class="input-group" style="padding: 1px">						
-						<input class="form-control" id="product_name" name="product_name" type="text" placeholder="Or Enter Product Name Here..." />
-					
-					</div>
-					
-					<div class="row">
-						<div class="col-sm-12">
-							<center><input type="submit" class="btn btn-success" value="Submit" name="scanSubmit" />
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<input type="reset" class="btn btn-danger" value="Reset" name="resetSubmit" /></center>
-						</div>
-					
-					</div>
-					
-				</form>
+				  <div class="row">
+				  	  <div class="col-lg-12">
+					  	<h5><strong>Product Name : </strong><?php echo $row['product_name']; ?></h5>
+						<p><strong>Category : </strong><?php echo $row['category']; ?></p>
+						<p><strong>Company : </strong><?php echo $row['company']; ?> &nbsp;&nbsp;&nbsp;<strong>Price : </strong>Rs. <?php echo $row['price']; ?> /-</p>
+						  
+						  <?php 
+						  	$q1 = mysqli_query($con, "SELECT avg(rating) AS rating FROM product_review WHERE product_id = '".$product_id."'");
+						  	$row1 = $q1->fetch_assoc();
+						  	$r1 = $row1['rating'];
+						  	$q2 = mysqli_query($con, "SELECT avg(rating) AS rating FROM local_review WHERE product_id = '".$product_id."'");
+						  	$row2 = $q2->fetch_assoc();
+						  	$r2 = $row2['rating'];
+						  
+						  	$lstar = (5*$r1 + 2*$r2)/7;
+						  ?>
+						  <div class="row">
+						  	
+							<div class="col-lg-4">
+								<p><strong>Online <i class="fa fa-star text-danger"> </i> Rating</strong> : <?php echo number_format($r1,1); ?> / 5</p>
+							</div>  
+							<div class="col-lg-4">
+								<p><strong>Local <i class="fa fa-star text-danger"> </i> Rating</strong> : <?php echo number_format($r2,1); ?> / 5</p>
+							
+							</div>
+							<div class="col-lg-4">
+								<p><strong>Loop <i class="fa fa-star text-danger"> </i> Rating</strong> : <?php echo number_format($lstar,1); ?> / 5</p>
+							</div>
+							
+						  </div>
+						  
+						  <br />
+						  <center><a href="home" class="btn btn-lg btn-info">Scan another Code</a></center>
+					  </div>
+					  
+				  </div>
 
               </div>
               <div class="card-footer ">
@@ -170,139 +196,116 @@ include_once 'dbconnect.php';
             </div>
           </div>
         </div>	
-		  <!-- MODAL DIALOG --->
-			<div class="modal" id="livestream_scanner">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-							<h4 class="modal-title">Barcode Scanner</h4>
-						</div>
-						<div class="modal-body" style="position: static">
-							<div id="interactive" class="viewport"></div>
-							<div class="error"></div>
-						</div>
-						<div class="modal-footer">
-							<label class="btn btn-default pull-left">
-								<i class="fa fa-camera"></i> Use camera app
-								<input type="file" accept="image/*;capture=camera" capture="camera" class="hidden" />
-							</label>
-							<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-						</div>
-					</div><!-- /.modal-content -->
-				</div><!-- /.modal-dialog -->
-			</div><!-- /.modal -->
 		  
-		<!---- SECOND DATA ROW -------
+
         <div class="row">
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-globe text-warning"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Capacity</p>
-                      <p class="card-title">150GB
-                        <p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-refresh"></i> Update Now
-                </div>
-              </div>
-            </div>
+          <div class="col-lg-6 col-md-6 col-sm-6">
+              <div class="card ">
+				  <div class="card-header ">
+					<h5 class="card-title"><i class="nc-icon nc-globe text-warning"></i> Online Reviews</h5>
+					<p class="card-category"><?php if(isset($upc)) echo $row['product_name'] ;?></p>
+				  </div>
+				  <div class="card-body ">
+					  <div class="row" style="max-height: 360px; overflow-y: auto; overflow-x: hidden">
+						  <div class="col-lg-12" style="margin-left: 5px;">
+							  <?php 
+							  	$queryReview = mysqli_query($con, "SELECT * FROM product_review WHERE product_id = '".$product_id."'");
+								if($queryReview->num_rows > 0){
+									while($review = $queryReview->fetch_assoc()) {
+										?>
+							  			<div class="row">
+							  				<div class="col-lg-12">
+												<p style="font-size: 18px;"><?php echo $review['review_title']; ?>&nbsp;&nbsp;<span style="font-size: 12px"><i class="fa fa-user"> </i> <?php echo $review['reviewer_name'] ; ?>  |  <i><?php echo substr($review['review_date'],0,10); ?></i></span>
+												<span style="float: right"><a href="scripts/change_upvote"><i class="fa fa-thumbs-up text-success"> </i></a> <strong><?php echo $review['upvote_count']; ?></strong></span>
+												</p>
+												
+												
+												<span><i><?php echo nl2br($review['review_full']) ;?></i></span>
+												<br />
+												<span style="padding-top : 5px">
+												<?php for($i=0; $i<$review['rating']; $i++) { ?>
+													<i class="fa fa-star"> </i> 
+												<?php } ?>
+													
+													<span style="float: right">Publisher : <strong><?php echo $review['publisher']; ?></strong></span>
+												</span>
+											</div>
+							  			</div>
+							  			<hr>
+							  <?php
+									}
+								}
+							  ?>
+							  
+							  <br/><center><i>End of Results</i></center>
+						  </div>
+
+					  </div>
+
+				  </div>
+				  <div class="card-footer ">
+					<hr>
+					<div class="stats">
+					  <i class="fa fa-info"></i> Online Reviews
+					</div>
+				  </div>
+				</div>
+
           </div>
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-money-coins text-success"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Revenue</p>
-                      <p class="card-title">$ 1,345
-                        <p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-calendar-o"></i> Last day
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-vector text-danger"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Errors</p>
-                      <p class="card-title">23
-                        <p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-clock-o"></i> In the last hour
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-favourite-28 text-primary"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Followers</p>
-                      <p class="card-title">+45K
-                        <p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-refresh"></i> Update now
-                </div>
-              </div>
-            </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-6">
+				<div class="card ">
+				  <div class="card-header ">
+					<h5 class="card-title"><i class="nc-icon nc-favourite-28 text-info"></i> Local Loop Reviews</h5>
+					<p class="card-category"><?php if(isset($upc)) echo $row['product_name'] ;?></p>
+				  </div>
+				  <div class="card-body ">
+					  <div class="row" style="max-height: 360px; overflow-y: auto; overflow-x: hidden">
+						  <div class="col-lg-12" style="margin-left: 5px;">
+							  <?php 
+							  	$queryReview = mysqli_query($con, "SELECT * FROM local_review WHERE product_id = '".$product_id."'");
+								if($queryReview->num_rows > 0){
+									while($review = $queryReview->fetch_assoc()) {
+										?>
+							  			<div class="row">
+							  				<div class="col-lg-12">
+												<p style="font-size: 18px;"><?php echo $review['review_title']; ?>&nbsp;&nbsp;<span style="font-size: 12px"><i class="fa fa-user"> </i> <?php echo $review['reviewer_name'] ; ?>  |  <i><?php echo substr($review['review_date'],0,10); ?></i></span>
+												<span style="float: right"><a href="scripts/change_upvote"><i class="fa fa-thumbs-up text-success"> </i></a> <strong><?php echo $review['upvote_count']; ?></strong></span>
+												</p>
+												
+												
+												<span><i><?php echo nl2br($review['review_full']) ;?></i></span>
+												<br />
+												<span style="padding-top : 5px">
+												<?php for($i=0; $i<$review['rating']; $i++) { ?>
+													<i class="fa fa-star"> </i> 
+												<?php } ?>
+													<span style="float: right">Publisher : <strong>Local Loop</strong></span>
+												</span>
+											</div>
+							  			</div>
+							  			<hr>
+							  <?php
+									}
+								}
+							  ?>
+							  
+							  <br/><center><i>End of Results</i></center>
+						  </div>
+
+					  </div>
+
+				  </div>
+				  <div class="card-footer ">
+					<hr>
+					<div class="stats">
+					  <i class="fa fa-leaf"></i> &copy; Local Loop
+					</div>
+				  </div>
+				</div>
           </div>
         </div>
-		------------------------------>
+
 
       </div>
 		
@@ -331,117 +334,6 @@ include_once 'dbconnect.php';
   </div>
 	
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  	<!---- QUAGGA --->
-	<script type="text/javascript" src="assets/js/libs/quagga.min.js"></script>
-	<style>
-		#interactive.viewport {position: relative; width: 100%; height: auto; overflow: hidden; text-align: center;}
-		#interactive.viewport > canvas, #interactive.viewport > video {max-width: 100%;width: 100%;}
-		canvas.drawing, canvas.drawingBuffer {position: absolute; left: 0; top: 0;}
-	</style>
-	<script type="text/javascript">
-		$(function() {
-			// Create the QuaggaJS config object for the live stream
-			var liveStreamConfig = {
-					inputStream: {
-						type : "LiveStream",
-						constraints: {
-							width: {min: 640},
-							height: {min: 480},
-							aspectRatio: {min: 1, max: 100},
-							facingMode: "environment" // or "user" for the front camera
-						}
-					},
-					locator: {
-						patchSize: "medium",
-						halfSample: true
-					},
-					numOfWorkers: (navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 4),
-					decoder: {
-						"readers":[
-							{"format":"ean_reader","config":{}}
-						]
-					},
-					locate: true
-				};
-			// The fallback to the file API requires a different inputStream option. 
-			// The rest is the same 
-			var fileConfig = $.extend(
-					{}, 
-					liveStreamConfig,
-					{
-						inputStream: {
-							size: 800
-						}
-					}
-				);
-			// Start the live stream scanner when the modal opens
-			$('#livestream_scanner').on('shown.bs.modal', function (e) {
-				Quagga.init(
-					liveStreamConfig, 
-					function(err) {
-						if (err) {
-							$('#livestream_scanner .modal-body .error').html('<div class="alert alert-danger"><strong><i class="fa fa-exclamation-triangle"></i> '+err.name+'</strong>: '+err.message+'</div>');
-							Quagga.stop();
-							return;
-						}
-						Quagga.start();
-					}
-				);
-			});
-
-			// Make sure, QuaggaJS draws frames an lines around possible 
-			// barcodes on the live stream
-			Quagga.onProcessed(function(result) {
-				var drawingCtx = Quagga.canvas.ctx.overlay,
-					drawingCanvas = Quagga.canvas.dom.overlay;
-
-				if (result) {
-					if (result.boxes) {
-						drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
-						result.boxes.filter(function (box) {
-							return box !== result.box;
-						}).forEach(function (box) {
-							Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
-						});
-					}
-
-					if (result.box) {
-						Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
-					}
-
-					if (result.codeResult && result.codeResult.code) {
-						Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
-					}
-				}
-			});
-
-			// Once a barcode had been read successfully, stop quagga and 
-			// close the modal after a second to let the user notice where 
-			// the barcode had actually been found.
-			Quagga.onDetected(function(result) {    		
-				if (result.codeResult.code){
-					$('#scanner_input').val(result.codeResult.code);
-					Quagga.stop();	
-					setTimeout(function(){ $('#livestream_scanner').modal('hide'); }, 1000);			
-				}
-			});
-
-			// Stop quagga in any case, when the modal is closed
-			$('#livestream_scanner').on('hide.bs.modal', function(){
-				if (Quagga){
-					Quagga.stop();	
-				}
-			});
-
-			// Call Quagga.decodeSingle() for every file selected in the 
-			// file input
-			$("#livestream_scanner input:file").on("change", function(e) {
-				if (e.target.files && e.target.files.length) {
-					Quagga.decodeSingle($.extend({}, fileConfig, {src: URL.createObjectURL(e.target.files[0])}), function(result) {alert(result.codeResult.code);});
-				}
-			});
-		});
-	</script>	
 	
   <!--   Core JS Files   -->
   <script src="assets/js/core/jquery.min.js"></script>
