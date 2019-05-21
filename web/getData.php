@@ -153,8 +153,13 @@ if(isset($_POST['scanSubmit'])) {
 				  <div class="row">
 				  	  <div class="col-lg-12">
 					  	<h5><strong>Product Name : </strong><?php echo $row['product_name']; ?></h5>
+						  <?php
+						  	$buffer = nl2br($row['product_details']);
+						  	$details = str_replace(array("\n", "\r"), '', $buffer);
+						  ?>
+						  <span><?php echo $details ; ?></span><br />
 						<p><strong>Category : </strong><?php echo $row['category']; ?></p>
-						<p><strong>Company : </strong><?php echo $row['company']; ?> &nbsp;&nbsp;&nbsp;<strong>Price : </strong>Rs. <?php echo $row['price']; ?> /-</p>
+						<p><strong>Company : </strong><?php echo $row['company']; ?> &nbsp;&nbsp;&nbsp;<br /><strong>Price : </strong>Rs. <?php echo $row['price']; ?> /-</p>
 						  
 						  <?php 
 						  	$q1 = mysqli_query($con, "SELECT avg(rating) AS rating FROM product_review WHERE product_id = '".$product_id."'");
