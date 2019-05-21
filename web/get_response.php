@@ -14,7 +14,7 @@
      $review_id = $review_id + 1;
 
 
-    $sql="INSERT INTO local_review (review_id,product_name,reviewer_name,rating,review_title,review_full,upvote_count) VALUES ('".$review_id."','".$productName."', '".$yourName."', '".$rating."', '".$reviewTitle."', '".$reviewFull."', '".$upvote."')";
+    $sql="INSERT INTO product_review (product_name,reviewer_name,rating,review_title,review_full,upvote_count) VALUES ('".$productName."', '".$yourName."', '".$rating."', '".$reviewTitle."', '".$reviewFull."', '".$upvote."')";
     if(!$result = $con->query($sql)){
     die('There was an error running the query [' . $con->error . ']');
     }
