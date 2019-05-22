@@ -171,12 +171,12 @@ $result = mysqli_query($con, $query);
 														
 				  </form>
 				<br />
-				<div id="result"  style="overflow-x: hidden; overflow-y: auto">
+				<div id="result"  style="overflow-x: auto; overflow-y: auto">
 				  <?php 
 					if(mysqli_num_rows($result) > 0)
 						{
 							$output .= '<center><h3>Results</h3></center>
-										<div class="table-responsive" style="overflow-x: hidden; overflow-y: auto">
+										<div class="table-responsive" style="overflow-x: auto; overflow-y: auto">
 											<table id="products" class="table table bordered">
 												<tr>
 													<th>UPC/EAN</th>

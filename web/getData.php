@@ -165,9 +165,11 @@ if(isset($_POST['scanSubmit'])) {
 						  	$q1 = mysqli_query($con, "SELECT avg(rating) AS rating FROM product_review WHERE product_id = '".$product_id."'");
 						  	$row1 = $q1->fetch_assoc();
 						  	$r1 = $row1['rating'];
+						  	if($r1 == 0) $r1 = 5;
 						  	$q2 = mysqli_query($con, "SELECT avg(rating) AS rating FROM local_review WHERE product_id = '".$product_id."'");
 						  	$row2 = $q2->fetch_assoc();
 						  	$r2 = $row2['rating'];
+						  	if($r2 == 0) $r2 = 5;
 						  
 						  	$lstar = (5*$r1 + 2*$r2)/7;
 						  ?>

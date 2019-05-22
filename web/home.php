@@ -148,7 +148,7 @@ if(isset($_GET['ean']))
 							</button> 
 						</span>
 					</div>	
-					<?php if(!isset($ean)) { ?>
+					<?php if(0) { ?>
 					<div class="input-group" style="padding: 1px">						
 						<input class="form-control" id="product_name" name="product_name" type="text" placeholder="Or Enter Product Name Here..." onChange="storeMethod()" />
 						<span class="input-group-btn"> 
@@ -169,11 +169,25 @@ if(isset($_GET['ean']))
 					<?php } ?>
 					
 					<div class="row">
-						<div class="col-sm-12">
-							<center><input type="submit" class="btn btn-success" value="Submit" name="scanSubmit" />
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							<input type="reset" class="btn btn-danger" value="Reset" name="resetSubmit" /></center>
+						<?php if(!isset($ean)) { ?>
+						<div class="col-lg-4 col-sm-12">
+							<center><a href="search">
+								<button class="btn btn-warning" type="button">
+									<i class="fa fa-search"></i> Search Product
+								</button> 
+							</a></center>
 						</div>
+						<?php } ?>
+						<div class="col-lg-4 col-sm-6">
+							<center><input type="submit" class="btn btn-success" value="Submit" name="scanSubmit" /></center>
+						</div>
+							
+						<div class="col-lg-4 col-sm-6">							
+							<center>	
+							<input type="reset" class="btn btn-danger" value="Reset" name="resetSubmit" /></center>
+						</div>	
+							
+						
 					
 					</div>
 					

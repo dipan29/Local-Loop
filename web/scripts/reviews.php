@@ -211,7 +211,7 @@
 					<div class="col-md-6">
 						<div class="form-group">
 						<label for="Upvote Count">Upvotes</label>
-						<input type="number" class="form-control" name="upvote" max="45" placeholder="Upvote Count" required>
+						<input type="number" class="form-control" name="upvote" max="10000" placeholder="Upvote Count" required>
 						</div>
 					
 					</div>
