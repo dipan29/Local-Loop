@@ -1,4 +1,7 @@
 <?php
+
+$review_len_lim = 100;
+
 session_start();
 include_once 'dbconnect.php';
 
@@ -36,6 +39,23 @@ if(isset($_POST['scanSubmit'])) {
   <!-- CSS Files -->
   <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
   <link href="assets/css/paper-dashboard.css?v=2.0.0" rel="stylesheet" />
+	
+  <?php //include_once "scripts/special_readmore_css.php" ?>
+  <style>	
+  <?php 
+	$resultT = mysqli_query($con, "SELECT * FROM product_review WHERE product_id = '".$product_id."'");
+	while($rowT = $resultT->fetch_assoc()) {
+		echo "#more_".$rowT['review_id']." {display: none;} ";
+	}
+  ?>
+  <?php 
+	$resultTA = mysqli_query($con, "SELECT * FROM local_review WHERE product_id = '".$product_id."'");
+	while($rowTA = $resultTA->fetch_assoc()) {
+		echo "#more2_".$rowTA['review_id']." {display: none;} ";
+	}
+  ?>	  
+  </style>
+	
 </head>
 
 <body class="">
@@ -228,7 +248,12 @@ if(isset($_POST['scanSubmit'])) {
 												</p>
 												
 												
-												<span><i><?php echo nl2br($review['review_full']) ;?></i></span>
+												<span><i><?php echo nl2br(substr($review['review_full'],0,$review_len_lim)) ;?><span id="dots_<?php echo $review['review_id']; ?>"> ......</span><span id="more_<?php echo $review['review_id']; ?>"><?php echo nl2br(substr($review['review_full'],$review_len_lim,strlen($review['review_full'])+1)) ;?></span></i></span>
+												
+												<?php if(strlen($review['review_full']) > $review_len_lim) { ?>
+												<br /><button class="btn btn-sm btn-secondary" onclick="myFunction_<?php echo $review['review_id']; ?>()" id="myBtn_<?php echo $review['review_id']; ?>">Read More!</button>
+												<?php } ?>
+												
 												<br />
 												<span style="padding-top : 5px">
 												<?php for($i=0; $i<$review['rating']; $i++) { ?>
@@ -280,9 +305,13 @@ if(isset($_POST['scanSubmit'])) {
 												<p style="font-size: 18px;"><?php echo $review['review_title']; ?>&nbsp;&nbsp;<span style="font-size: 12px"><i class="fa fa-user"> </i> <?php echo $review['reviewer_name'] ; ?>  |  <i><?php echo substr($review['review_date'],0,10); ?></i></span>
 												<span style="float: right"><a href="scripts/change_upvote"><i class="fa fa-thumbs-up text-success"> </i></a> <strong><?php echo $review['upvote_count']; ?></strong></span>
 												</p>
+																								
+												<span><i><?php echo nl2br(substr($review['review_full'],0,$review_len_lim)) ;?><span id="dots2_<?php echo $review['review_id']; ?>"> ......</span><span id="more2_<?php echo $review['review_id']; ?>"><?php echo nl2br(substr($review['review_full'],$review_len_lim,strlen($review['review_full'])+1)) ;?></span></i></span>
 												
+												<?php if(strlen($review['review_full']) > $review_len_lim) { ?>
+												<br /><button class="btn btn-sm btn-secondary" onclick="myFunction2_<?php echo $review['review_id']; ?>()" id="myBtn2_<?php echo $review['review_id']; ?>">Read More!</button>
+												<?php } ?>
 												
-												<span><i><?php echo nl2br($review['review_full']) ;?></i></span>
 												<br />
 												<span style="padding-top : 5px">
 												<?php for($i=0; $i<$review['rating']; $i++) { ?>
@@ -340,6 +369,56 @@ if(isset($_POST['scanSubmit'])) {
       </footer>
     </div>
   </div>
+  
+  <!-- Read More Script -->
+	<script>
+		<?php 
+			$resultT2 = mysqli_query($con, "SELECT * FROM product_review WHERE product_id = '".$product_id."'");
+			while($rowT2 = $resultT2->fetch_assoc()) {
+		?>
+			function myFunction_<?php echo $rowT2['review_id'] ; ?>() {
+			  var dots = document.getElementById("dots_<?php echo $rowT2['review_id'] ; ?>");
+			  var moreText = document.getElementById("more_<?php echo $rowT2['review_id'] ; ?>");
+			  var btnText = document.getElementById("myBtn_<?php echo $rowT2['review_id'] ; ?>");
+
+			  if (dots.style.display === "none") {
+				dots.style.display = "inline";
+				btnText.innerHTML = "Read more"; 
+				moreText.style.display = "none";
+			  } else {
+				dots.style.display = "none";
+				btnText.innerHTML = "Read less"; 
+				moreText.style.display = "inline";
+			  }
+			}
+		<?php
+				}
+	    ?>
+		
+		<?php 
+			$resultTA2 = mysqli_query($con, "SELECT * FROM local_review WHERE product_id = '".$product_id."'");
+			while($rowTA2 = $resultTA2->fetch_assoc()) {
+		?>
+			function myFunction2_<?php echo $rowTA2['review_id'] ; ?>() {
+			  var dots = document.getElementById("dots2_<?php echo $rowTA2['review_id'] ; ?>");
+			  var moreText = document.getElementById("more2_<?php echo $rowTA2['review_id'] ; ?>");
+			  var btnText = document.getElementById("myBtn2_<?php echo $rowTA2['review_id'] ; ?>");
+
+			  if (dots.style.display === "none") {
+				dots.style.display = "inline";
+				btnText.innerHTML = "Read more"; 
+				moreText.style.display = "none";
+			  } else {
+				dots.style.display = "none";
+				btnText.innerHTML = "Read less"; 
+				moreText.style.display = "inline";
+			  }
+			}
+		<?php
+				}
+	    ?>
+		
+	</script>
 	
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	

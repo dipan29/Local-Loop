@@ -79,7 +79,7 @@
 			</h3>
 
 			<div>
-				<button class="how-btn-play1 flex-c-m">
+				<button data-toggle="modal" data-target="#exampleModalCenter" class="how-btn-play1 flex-c-m">
 					<i class="zmdi zmdi-play"></i>
 				</button>
 			</div>
@@ -157,7 +157,33 @@
 
   </div>
 </div>	  
+<!-- Designer Modal -->
 
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true">
+
+  <!-- Add .modal-dialog-centered to .modal-dialog to vertically center the modal -->
+  <div class="modal-dialog modal-dialog-centered" role="document">
+
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Get Started</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>We are launching on <strong>9th June, 2019</strong>. Stay Tuned!</p>
+		<br />
+		<p>- Local Loop Team &hearts;</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OKAY</button>
+      </div>
+    </div>
+  </div>
+</div>	
 
 	
 
