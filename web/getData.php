@@ -12,11 +12,21 @@ if(isset($_POST['scanSubmit'])) {
 	
 	if($upc){
 		$query = mysqli_query($con, "SELECT * FROM product_info WHERE upc = '".$upc."' ");
+		
+		if ($query->num_rows == 0) {
+			$show = "<script>
+			alert('The Provided UPC Number is either Invalid or isn\'t in our database yet. We will fetch it, PLEASE RESCAN IT.');
+			window.location.href='home';
+			</script>";
+		} else {
+			//$show = 1;
+		}
+		
 		if($query->num_rows == 1){
 			$row = $query->fetch_assoc();			
 			$product_id = $row['product_id'];
 			
-		}
+		} 
 	}
 }
 
@@ -59,6 +69,8 @@ if(isset($_POST['scanSubmit'])) {
 </head>
 
 <body class="">
+	<?php if(isset($show)) echo $show; ?>
+	
   <div class="wrapper ">
     <div class="sidebar" data-color="white" data-active-color="danger">
       <!--
