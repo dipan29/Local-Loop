@@ -65,11 +65,12 @@
 			</div>
 
 			<div class="m-t-10 m-b-10">
-				<a href="#" class="size2 s1-txt1 flex-c-m how-btn1 trans-04">
+				<a data-toggle="modal" href="#myModal" class="size2 s1-txt1 flex-c-m how-btn1 trans-04">
 					About
 				</a>
 			</div>
 		</div>
+	    		
 
 		<!--  -->
 		<div class="flex-col-c-m p-l-15 p-r-15 p-t-80 p-b-90">
@@ -115,7 +116,47 @@
 			</form>
 		</div>
 	</div>
+	
+	
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog" style="z-index:5000">
+  <div class="modal-dialog modal-dialog-scrollable">
 
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		  <h4 class="modal-title">About <strong>Local Loop</strong></h4>
+      </div>
+      <div class="modal-body">
+		<br />  
+        <p>Finding Product Online is very easy nowadays, but when we shop offline, getting the same product at the same price bracket is tough as Online Requires Less Handling And Hand Transfer Costs than offline. But this is not the only problem faced by Customers Shopping offline, there are certain other dilemmas and insisted confusion created by the sellers or the shopkeepers so as to make the customer blindly purchase the product.</p>
+		<br />
+		<p>Even if the quality and product standard are judged by the hands and eyes of the customer, it’s not easy to know how better the product performs in the long run. Or what are the experiences of the other customer in using that product. So for the Same, We are up with an APP That solves all these certain Problems, by providing reviews, data from online sites and the product and shop experience by other customers instantly, as the user points the camera at the product stand in any shop or mall.
+		</p>
+		<br />
+		<p>
+		  So, We four Engineers from <strong>Kalyani Government Engineering College</strong>, came up with Local Loop, an innovative way to see product reviews when bought offline even. <br />
+			<ol>
+		  		<li>1. Dipan Roy</li>
+				<li>2. Abhinav Ghosh</li>
+				<li>3. Sayantan Saha</li>
+				<li>4. Ayan Bag</li>
+		  	</ol>
+		</p>
+		<br />
+		<p>
+			Our WEB-APP will go live on 9th June, 2019. Please bear with us till then, and keep checking this place for updates. <br /><br />- Local Loop Team &hearts; 
+		</p>
+		  
+      </div>
+      <div class="modal-footer">
+	  	<button type="button" class="btn btn-warning" data-dismiss="modal">Thank You!</button>
+	  </div>
+    </div>
+
+  </div>
+</div>	  
 
 
 	
